@@ -1,36 +1,574 @@
-function doPost(e) {
-  try {
-    const data = JSON.parse(e.postData.contents);
-    
-    // Логируем полученные данные
-    console.log('Received data:', data);
-    
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        status: 'success',
-        message: 'Data received',
-        received_data: data
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
-      
-  } catch (error) {
-    console.error('Error:', error);
-    
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        status: 'error',
-        message: error.toString()
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-function doGet(e) {
-  return ContentService
-    .createTextOutput(JSON.stringify({
-      status: 'success',
-      message: 'GAS is working!',
-      timestamp: new Date().toISOString()
-    }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0088cc 0%, #00a2e8 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #0088cc;
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .config-section {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .config-section h3 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0088cc 0%, #00a2e8 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #555;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        .notification.info {
+            background: #2196F3;
+        }
+
+        .notification.warning {
+            background: #ff9800;
+        }
+
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .icon {
+            font-size: 18px;
+        }
+
+        .debug-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid #e9ecef;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .debug-info h4 {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-connected {
+            background: #28a745;
+        }
+
+        .status-disconnected {
+            background: #dc3545;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 25px 15px;
+            }
+            
+            .content {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Mini App</h1>
+            <p>Управление вашими данными</p>
+        </div>
+        
+        <div class="content">
+            <div class="config-section">
+                <h3>⚙️ Настройка GAS URL</h3>
+                <input type="text" id="gasUrl" class="url-input" 
+                       placeholder="https://script.google.com/macros/s/ВАШ_SCRIPT_ID/exec">
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="saveConfig()" style="padding: 10px 15px; flex: 1;">
+                        💾 Сохранить URL
+                    </button>
+                    <button class="btn btn-secondary" onclick="testConnection()" style="padding: 10px 15px; flex: 1;">
+                        🔍 Тест подключения
+                    </button>
+                </div>
+            </div>
+            
+            <div class="user-info" id="userInfo">
+                <p><strong>Статус GAS:</strong> 
+                    <span id="gasStatus">
+                        <span class="status-indicator status-disconnected"></span>
+                        Не подключено
+                    </span>
+                </p>
+                <p><strong>ID пользователя:</strong> <span id="userId">-</span></p>
+                <p><strong>Имя пользователя:</strong> <span id="userName">-</span></p>
+                <p><strong>Язык:</strong> <span id="userLanguage">-</span></p>
+                <p><strong>GAS URL:</strong> <span id="currentGasUrl">не задан</span></p>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" id="writeDataBtn" onclick="writeData()">
+                    <span class="icon">📝</span>
+                    Записать данные
+                </button>
+                
+                <button class="btn btn-secondary" id="readDataBtn" onclick="readData()">
+                    <span class="icon">📊</span>
+                    Получить данные
+                </button>
+                
+                <button class="btn btn-danger" onclick="closeApp()">
+                    <span class="icon">✕</span>
+                    Закрыть приложение
+                </button>
+            </div>
+
+            <div class="debug-info">
+                <h4>🔍 Лог выполнения:</h4>
+                <div id="debugLog"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        
+        // Элементы DOM
+        const elements = {
+            userId: document.getElementById('userId'),
+            userName: document.getElementById('userName'),
+            userLanguage: document.getElementById('userLanguage'),
+            currentGasUrl: document.getElementById('currentGasUrl'),
+            gasUrl: document.getElementById('gasUrl'),
+            gasStatus: document.getElementById('gasStatus'),
+            writeDataBtn: document.getElementById('writeDataBtn'),
+            readDataBtn: document.getElementById('readDataBtn'),
+            notification: document.getElementById('notification'),
+            debugLog: document.getElementById('debugLog')
+        };
+
+        // Конфигурация
+        let CONFIG = {
+            GAS_URL: localStorage.getItem('gas_url') || ''
+        };
+
+        // Логирование отладочной информации
+        function logDebug(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'color: #dc3545;' : 
+                         type === 'success' ? 'color: #28a745;' : 'color: #007bff;';
+            const logEntry = `<div style="${color}">[${timestamp}] ${message}</div>`;
+            elements.debugLog.innerHTML = logEntry + elements.debugLog.innerHTML;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Обновление статуса подключения
+        function updateConnectionStatus(connected, message = '') {
+            const indicator = elements.gasStatus.querySelector('.status-indicator');
+            const text = elements.gasStatus;
+            
+            if (connected) {
+                indicator.className = 'status-indicator status-connected';
+                text.innerHTML = '<span class="status-indicator status-connected"></span>Подключено';
+                if (message) logDebug(message, 'success');
+            } else {
+                indicator.className = 'status-indicator status-disconnected';
+                text.innerHTML = '<span class="status-indicator status-disconnected"></span>Не подключено';
+                if (message) logDebug(message, 'error');
+            }
+        }
+
+        // Сохранение конфигурации
+        function saveConfig() {
+            const url = elements.gasUrl.value.trim();
+            if (url && url.includes('google.com')) {
+                CONFIG.GAS_URL = url;
+                localStorage.setItem('gas_url', url);
+                elements.currentGasUrl.textContent = url;
+                showNotification('✅ URL сохранен!', 'success');
+                logDebug(`GAS URL сохранен: ${url}`, 'success');
+                testConnection();
+            } else {
+                showNotification('❌ Введите корректный Google Apps Script URL', 'error');
+            }
+        }
+
+        // Тестирование подключения
+        async function testConnection() {
+            if (!CONFIG.GAS_URL) {
+                showNotification('❌ Сначала настройте GAS URL', 'error');
+                return;
+            }
+
+            logDebug('Тестирование подключения к GAS...', 'info');
+            
+            try {
+                const response = await fetch(CONFIG.GAS_URL, {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+
+                // Для no-cors mode мы не можем прочитать ответ, но если нет ошибки - соединение работает
+                updateConnectionStatus(true, '✅ Подключение к GAS успешно');
+                showNotification('✅ Подключение успешно!', 'success');
+                
+            } catch (error) {
+                logDebug(`Ошибка подключения: ${error.message}`, 'error');
+                updateConnectionStatus(false, `❌ Ошибка подключения: ${error.message}`);
+                showNotification('❌ Ошибка подключения', 'error');
+            }
+        }
+
+        // Инициализация приложения
+        function initApp() {
+            try {
+                // Расширяем приложение на весь экран
+                tg.expand();
+                
+                // Получаем данные пользователя
+                const user = tg.initDataUnsafe?.user || {};
+                
+                // Отображаем информацию о пользователе
+                elements.userId.textContent = user.id || 'Не доступно';
+                elements.userName.textContent = user.username 
+                    ? `@${user.username}` 
+                    : (user.first_name || 'Не доступно');
+                elements.userLanguage.textContent = user.language_code || 'Не доступно';
+                
+                // Отображаем текущий GAS URL
+                elements.currentGasUrl.textContent = CONFIG.GAS_URL || 'не задан';
+                elements.gasUrl.value = CONFIG.GAS_URL;
+                
+                if (CONFIG.GAS_URL) {
+                    testConnection();
+                }
+                
+                logDebug('Telegram WebApp инициализирован', 'success');
+                logDebug(`User ID: ${user.id}`, 'info');
+                logDebug(`Username: ${user.username || user.first_name}`, 'info');
+                
+            } catch (error) {
+                logDebug(`Ошибка инициализации: ${error.message}`, 'error');
+                showNotification('Ошибка инициализации приложения', 'error');
+            }
+        }
+
+        // Функция записи данных
+        async function writeData() {
+            if (!CONFIG.GAS_URL) {
+                showNotification('❌ Сначала настройте GAS URL', 'error');
+                return;
+            }
+
+            const button = elements.writeDataBtn;
+            const originalText = button.innerHTML;
+            
+            try {
+                button.innerHTML = '<div class="loading"></div> Отправка...';
+                button.disabled = true;
+                
+                const user = tg.initDataUnsafe?.user || {};
+                
+                // Подготовка данных для отправки
+                const requestData = {
+                    user_id: user.id,
+                    user_name: user.username || user.first_name || 'Unknown',
+                    action: 'logEvent',
+                    data: {
+                        timestamp: new Date().toISOString(),
+                        event_type: 'data_write',
+                        platform: 'telegram_web_app',
+                        user_data: {
+                            id: user.id,
+                            username: user.username,
+                            first_name: user.first_name,
+                            last_name: user.language_code,
+                            language_code: user.language_code,
+                            is_premium: user.is_premium || false
+                        },
+                        additional_info: {
+                            web_app_version: '1.0',
+                            user_agent: navigator.userAgent
+                        }
+                    }
+                };
+                
+                logDebug('Отправка POST запроса с данными...', 'info');
+                logDebug(`Данные: ${JSON.stringify(requestData, null, 2)}`, 'info');
+                
+                // Отправка запроса на GAS
+                const response = await fetch(CONFIG.GAS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                logDebug(`Статус ответа: ${response.status}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                logDebug(`Ответ GAS: ${JSON.stringify(result, null, 2)}`, 'success');
+                
+                showNotification('✅ Данные успешно записаны!');
+                
+                // Вибрация (если поддерживается)
+                if (navigator.vibrate) {
+                    navigator.vibrate(200);
+                }
+                
+            } catch (error) {
+                logDebug(`Ошибка при записи данных: ${error.message}`, 'error');
+                showNotification(`❌ Ошибка: ${error.message}`, 'error');
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Функция чтения данных (GET запрос)
+        async function readData() {
+            if (!CONFIG.GAS_URL) {
+                showNotification('❌ Сначала настройте GAS URL', 'error');
+                return;
+            }
+
+            const button = elements.readDataBtn;
+            const originalText = button.innerHTML;
+            
+            try {
+                button.innerHTML = '<div class="loading"></div> Загрузка...';
+                button.disabled = true;
+                
+                logDebug('Отправка GET запроса...', 'info');
+                
+                const response = await fetch(CONFIG.GAS_URL, {
+                    method: 'GET'
+                });
+                
+                logDebug(`Статус ответа: ${response.status}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                logDebug(`GET ответ: ${JSON.stringify(result, null, 2)}`, 'success');
+                
+                showNotification('✅ Данные получены! Проверьте лог.', 'success');
+                
+            } catch (error) {
+                logDebug(`Ошибка при чтении данных: ${error.message}`, 'error');
+                showNotification(`❌ Ошибка: ${error.message}`, 'error');
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Функция закрытия приложения
+        function closeApp() {
+            tg.close();
+        }
+
+        // Функция показа уведомлений
+        function showNotification(message, type = 'success') {
+            const notification = elements.notification;
+            
+            notification.className = 'notification';
+            if (type === 'error') {
+                notification.classList.add('error');
+            } else if (type === 'info') {
+                notification.classList.add('info');
+            } else if (type === 'warning') {
+                notification.classList.add('warning');
+            }
+            
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
