@@ -1,0 +1,11 @@
+{
+    "app": {
+        "title": "Health Assistant",
+        "description": "Приложение для отслеживания здоровья",
+        "version": "1.0.0"
+    },
+    "webApp": {
+        "url": "https://your-domain.com/index.html",
+        "inline_mode": true
+    }
+}

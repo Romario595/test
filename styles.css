@@ -1,0 +1,128 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #ffffff;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+.panel {
+    flex: 1;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.panel:last-child {
+    border-right: none;
+}
+
+.buttons-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px;
+    gap: 10px;
+    overflow-y: auto;
+}
+
+/* Стили для центрирования при малом количестве кнопок */
+.buttons-container.centered {
+    justify-content: center;
+}
+
+.button {
+    width: 90%;
+    aspect-ratio: 1;
+    border: none;
+    border-radius: 12px;
+    background: #f8f9fa;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.button:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.category-btn {
+    width: 90%;
+    aspect-ratio: 1;
+    border: none;
+    border-radius: 12px;
+    background: #f8f9fa;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.category-btn.active {
+    background: #007bff;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+}
+
+.category-btn:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+}
+
+.category-btn.active:hover {
+    background: #0056b3;
+}
+
+/* Скрываем скроллбар но оставляем функциональность */
+.buttons-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.buttons-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.buttons-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 2px;
+}
+
+.buttons-container::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
