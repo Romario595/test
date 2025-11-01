@@ -9,13 +9,13 @@ body {
     background: #ffffff;
     height: 100vh;
     overflow: hidden;
+    position: relative;
 }
 
 .app-container {
     display: flex;
-    height: 100vh;
+    height: calc(100vh - 70px);
     width: 100vw;
-    position: relative;
 }
 
 .panel {
@@ -33,9 +33,8 @@ body {
 
 .panel.hidden {
     flex: 0;
-    width: 0;
     opacity: 0;
-    visibility: hidden;
+    pointer-events: none;
 }
 
 .buttons-container {
@@ -71,6 +70,7 @@ body {
     text-align: center;
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
 }
 
 .button:hover {
@@ -84,201 +84,129 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.category-btn {
-    width: 90%;
-    aspect-ratio: 1;
-    border: none;
-    border-radius: 12px;
-    background: #f8f9fa;
-    font-size: 16px;
-    font-weight: 500;
-    color: #333;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.category-btn.active {
+.button.active {
     background: #007bff;
     color: white;
     box-shadow: 0 4px 8px rgba(0,123,255,0.3);
 }
 
-.category-btn:hover {
-    background: #e9ecef;
-    transform: translateY(-1px);
+.button.selected {
+    background: #28a745;
+    color: white;
 }
 
-.category-btn.active:hover {
-    background: #0056b3;
-}
-
-/* Стили для панели деталей блюда */
-.dish-details-panel {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: white;
-    display: none;
-    flex-direction: column;
-    padding: 20px;
-}
-
-.dish-details-panel.active {
-    display: flex;
-}
-
-.dish-header {
-    text-align: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.dish-header h3 {
-    font-size: 24px;
-    color: #333;
-    font-weight: 600;
-}
-
-.ingredients-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    overflow-y: auto;
-    margin-bottom: 20px;
-}
-
-.ingredient-item {
+/* Стиль для кнопок с чекбоксами */
+.checkbox-button {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 15px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    border: 2px solid transparent;
-    transition: all 0.2s ease;
-    cursor: pointer;
+    text-align: left;
 }
 
-.ingredient-item:hover {
-    background: #e9ecef;
-    transform: translateY(-1px);
-}
-
-.ingredient-item.selected {
-    background: #e3f2fd;
-    border-color: #2196f3;
-}
-
-.ingredient-checkbox {
+.checkbox-button .checkmark {
     width: 20px;
     height: 20px;
-    border: 2px solid #ccc;
+    border: 2px solid #ddd;
     border-radius: 4px;
-    margin-right: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
     flex-shrink: 0;
-}
-
-.ingredient-item.selected .ingredient-checkbox {
-    background: #2196f3;
-    border-color: #2196f3;
-}
-
-.ingredient-item.selected .ingredient-checkbox::after {
-    content: '✓';
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.ingredient-name {
-    flex: 1;
-    font-size: 16px;
-    color: #333;
-    font-weight: 500;
-}
-
-.ingredient-quantity {
-    font-size: 14px;
-    color: #666;
     margin-left: 10px;
 }
 
-.bottom-actions {
-    display: flex;
-    gap: 15px;
-    padding-top: 20px;
-    border-top: 1px solid #e0e0e0;
+.checkbox-button.selected .checkmark {
+    background: #ffffff;
+    border-color: #28a745;
 }
 
-.action-btn {
-    flex: 1;
-    padding: 15px;
+.checkbox-button.selected .checkmark::after {
+    content: '✓';
+    color: #28a745;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Нижние кнопки */
+.bottom-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.bottom-buttons.hidden {
+    display: none;
+}
+
+.bottom-btn {
+    padding: 12px 24px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    text-align: center;
 }
 
-.back-btn {
+#start-over-btn {
     background: #6c757d;
     color: white;
 }
 
-.back-btn:hover {
+#start-over-btn:hover {
     background: #5a6268;
-    transform: translateY(-1px);
 }
 
-.save-btn {
-    background: #28a745;
+#save-btn {
+    background: #007bff;
     color: white;
 }
 
-.save-btn:hover {
-    background: #218838;
-    transform: translateY(-1px);
-}
-
-.save-btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
+#save-btn:hover {
+    background: #0056b3;
 }
 
 /* Скрываем скроллбар но оставляем функциональность */
-.buttons-container::-webkit-scrollbar,
-.ingredients-container::-webkit-scrollbar {
+.buttons-container::-webkit-scrollbar {
     width: 4px;
 }
 
-.buttons-container::-webkit-scrollbar-track,
-.ingredients-container::-webkit-scrollbar-track {
+.buttons-container::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.buttons-container::-webkit-scrollbar-thumb,
-.ingredients-container::-webkit-scrollbar-thumb {
+.buttons-container::-webkit-scrollbar-thumb {
     background: #ccc;
     border-radius: 2px;
 }
 
-.buttons-container::-webkit-scrollbar-thumb:hover,
-.ingredients-container::-webkit-scrollbar-thumb:hover {
+.buttons-container::-webkit-scrollbar-thumb:hover {
     background: #999;
+}
+
+/* Анимации */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.button {
+    animation: slideIn 0.3s ease;
 }
