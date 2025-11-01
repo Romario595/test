@@ -1,11 +1,58 @@
-// Данные для кнопок
+// Расширенные данные для кнопок с составом блюд
 const buttonData = {
     nutrition: [
-        { name: "Завтрак", subButtons: ["Овсянка", "Яйца", "Тост"] },
-        { name: "Обед", subButtons: ["Суп", "Салат", "Мясо"] },
-        { name: "Ужин", subButtons: ["Рыба", "Овощи", "Курица"] },
-        { name: "Перекус", subButtons: ["Фрукты", "Орехи", "Йогурт","Фрукты", "Орехи", "Йогурт","Фрукты", "Орехи", "Йогурт"] },
-        { name: "Напитки", subButtons: ["Вода", "Сок", "Чай"] }
+        { 
+            name: "Завтрак", 
+            subButtons: [
+                { name: "Овсянка", ingredients: ["Овсяные хлопья", "Молоко", "Мед", "Фрукты", "Орехи"] },
+                { name: "Яйца", ingredients: ["Яйца куриные", "Масло сливочное", "Соль", "Перец", "Зелень"] },
+                { name: "Тост", ingredients: ["Хлеб", "Авокадо", "Помидор", "Сыр", "Специи"] }
+            ] 
+        },
+        { 
+            name: "Обед", 
+            subButtons: [
+                { 
+                    name: "Суп", 
+                    ingredients: [
+                        { name: "Картофель", quantity: "200г" },
+                        { name: "Морковь", quantity: "100г" },
+                        { name: "Лук", quantity: "50г" },
+                        { name: "Курица", quantity: "150г" },
+                        { name: "Зелень", quantity: "20г" },
+                        { name: "Специи", quantity: "по вкусу" }
+                    ] 
+                },
+                { 
+                    name: "Салат", 
+                    ingredients: [
+                        { name: "Помидоры", quantity: "150г" },
+                        { name: "Огурцы", quantity: "100г" },
+                        { name: "Лук", quantity: "30г" },
+                        { name: "Масло оливковое", quantity: "20мл" },
+                        { name: "Соль", quantity: "по вкусу" }
+                    ] 
+                },
+                { 
+                    name: "Мясо", 
+                    ingredients: [
+                        { name: "Говядина", quantity: "200г" },
+                        { name: "Лук", quantity: "50г" },
+                        { name: "Чеснок", quantity: "10г" },
+                        { name: "Специи", quantity: "по вкусу" },
+                        { name: "Масло растительное", quantity: "30мл" }
+                    ] 
+                }
+            ] 
+        },
+        { 
+            name: "Ужин", 
+            subButtons: [
+                { name: "Рыба", ingredients: ["Филе рыбы", "Лимон", "Специи", "Зелень", "Оливковое масло"] },
+                { name: "Овощи", ingredients: ["Брокколи", "Морковь", "Цветная капуста", "Специи", "Масло"] },
+                { name: "Курица", ingredients: ["Куриное филе", "Чеснок", "Соевый соус", "Мед", "Специи"] }
+            ] 
+        }
     ],
     allergy: [
         { name: "Пищевая", subButtons: ["Орехи", "Молоко", "Яйца"] },
@@ -28,6 +75,8 @@ class HealthApp {
     constructor() {
         this.currentCategory = 'nutrition';
         this.currentMiddleButton = null;
+        this.currentDish = null;
+        this.selectedIngredients = new Set();
         this.init();
     }
 
@@ -56,6 +105,15 @@ class HealthApp {
             });
         });
 
+        // Обработчики для кнопок навигации
+        document.getElementById('back-to-start').addEventListener('click', () => {
+            this.backToStart();
+        });
+
+        document.getElementById('save-dish').addEventListener('click', () => {
+            this.saveDish();
+        });
+
         // Обработчик изменения размера окна
         window.addEventListener('resize', () => {
             this.updateCentering();
@@ -77,6 +135,9 @@ class HealthApp {
         
         // Очищаем правую панель
         this.clearRightPanel();
+        
+        // Показываем все панели
+        this.showAllPanels();
     }
 
     loadCategoryButtons(category) {
@@ -121,16 +182,144 @@ class HealthApp {
         subButtons.forEach((subButton, index) => {
             const buttonElement = document.createElement('button');
             buttonElement.className = 'button';
-            buttonElement.textContent = subButton;
+            
+            // Проверяем, является ли subButton объектом или строкой
+            if (typeof subButton === 'object') {
+                buttonElement.textContent = subButton.name;
+            } else {
+                buttonElement.textContent = subButton;
+            }
             
             buttonElement.addEventListener('click', () => {
-                this.handleRightButtonClick(subButton);
+                if (typeof subButton === 'object' && subButton.ingredients) {
+                    this.showDishDetails(subButton);
+                } else {
+                    this.handleRightButtonClick(subButton);
+                }
             });
             
             rightPanel.appendChild(buttonElement);
         });
 
         this.updateCentering();
+    }
+
+    showDishDetails(dish) {
+        this.currentDish = dish;
+        this.selectedIngredients.clear();
+        
+        // Скрываем основные панели
+        this.hideMainPanels();
+        
+        // Показываем панель деталей блюда
+        const detailsPanel = document.getElementById('dish-details-panel');
+        detailsPanel.classList.add('active');
+        
+        // Устанавливаем название блюда
+        document.getElementById('dish-name').textContent = dish.name;
+        
+        // Загружаем ингредиенты
+        this.loadIngredients(dish.ingredients);
+        
+        // Обновляем кнопку сохранения
+        this.updateSaveButton();
+    }
+
+    loadIngredients(ingredients) {
+        const container = document.getElementById('ingredients-container');
+        container.innerHTML = '';
+
+        ingredients.forEach((ingredient, index) => {
+            const ingredientItem = document.createElement('div');
+            ingredientItem.className = 'ingredient-item';
+            ingredientItem.dataset.index = index;
+            
+            // Проверяем формат ингредиента (объект или строка)
+            const ingredientName = typeof ingredient === 'object' ? ingredient.name : ingredient;
+            const ingredientQuantity = typeof ingredient === 'object' ? ingredient.quantity : '';
+            
+            ingredientItem.innerHTML = `
+                <div class="ingredient-checkbox"></div>
+                <span class="ingredient-name">${ingredientName}</span>
+                ${ingredientQuantity ? `<span class="ingredient-quantity">${ingredientQuantity}</span>` : ''}
+            `;
+            
+            ingredientItem.addEventListener('click', () => {
+                this.toggleIngredient(ingredientName, ingredientItem);
+            });
+            
+            container.appendChild(ingredientItem);
+        });
+    }
+
+    toggleIngredient(ingredientName, ingredientElement) {
+        if (this.selectedIngredients.has(ingredientName)) {
+            this.selectedIngredients.delete(ingredientName);
+            ingredientElement.classList.remove('selected');
+        } else {
+            this.selectedIngredients.add(ingredientName);
+            ingredientElement.classList.add('selected');
+        }
+        
+        this.updateSaveButton();
+    }
+
+    updateSaveButton() {
+        const saveBtn = document.getElementById('save-dish');
+        if (this.selectedIngredients.size > 0) {
+            saveBtn.disabled = false;
+        } else {
+            saveBtn.disabled = true;
+        }
+    }
+
+    backToStart() {
+        // Скрываем панель деталей
+        const detailsPanel = document.getElementById('dish-details-panel');
+        detailsPanel.classList.remove('active');
+        
+        // Показываем основные панели
+        this.showAllPanels();
+        
+        // Сбрасываем выбранные ингредиенты
+        this.selectedIngredients.clear();
+        this.currentDish = null;
+    }
+
+    saveDish() {
+        if (this.selectedIngredients.size === 0) return;
+        
+        const selectedIngredientsArray = Array.from(this.selectedIngredients);
+        
+        // Здесь можно добавить логику сохранения данных
+        console.log('Сохранено блюдо:', {
+            dish: this.currentDish.name,
+            selectedIngredients: selectedIngredientsArray
+        });
+        
+        // Показываем уведомление в Telegram
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.showPopup({
+                title: 'Сохранено!',
+                message: `Блюдо "${this.currentDish.name}" сохранено с ${this.selectedIngredients.size} ингредиентами`,
+                buttons: [{ type: 'ok' }]
+            });
+        }
+        
+        // Возвращаемся в начало
+        this.backToStart();
+    }
+
+    hideMainPanels() {
+        document.getElementById('left-panel').classList.add('hidden');
+        document.getElementById('middle-panel').classList.add('hidden');
+        document.getElementById('right-panel').classList.add('hidden');
+    }
+
+    showAllPanels() {
+        document.getElementById('left-panel').classList.remove('hidden');
+        document.getElementById('middle-panel').classList.remove('hidden');
+        document.getElementById('right-panel').classList.remove('hidden');
     }
 
     clearRightPanel() {
@@ -140,17 +329,7 @@ class HealthApp {
     }
 
     handleRightButtonClick(buttonName) {
-        // Здесь можно добавить логику обработки нажатия на кнопку правой панели
         console.log(`Выбрано: ${this.currentCategory} -> ${this.currentMiddleButton?.name} -> ${buttonName}`);
-        
-        // Пример показа уведомления в Telegram
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.showPopup({
-                title: 'Выбор сохранен',
-                message: `Вы выбрали: ${buttonName}`,
-                buttons: [{ type: 'ok' }]
-            });
-        }
     }
 
     updateCentering() {
