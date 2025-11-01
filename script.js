@@ -1,89 +1,76 @@
-// Расширенные данные для кнопок с составом блюд
+// Расширенные данные для кнопок
 const buttonData = {
     nutrition: [
         { 
             name: "Завтрак", 
             subButtons: [
-                { name: "Овсянка", ingredients: ["Овсяные хлопья", "Молоко", "Мед", "Фрукты", "Орехи"] },
-                { name: "Яйца", ingredients: ["Яйца куриные", "Масло сливочное", "Соль", "Перец", "Зелень"] },
-                { name: "Тост", ingredients: ["Хлеб", "Авокадо", "Помидор", "Сыр", "Специи"] }
+                { name: "Овсянка", ingredients: ["Овсяные хлопья", "Молоко", "Мед", "Фрукты"] },
+                { name: "Яйца", ingredients: ["Яйца куриные", "Масло", "Соль", "Перец"] },
+                { name: "Тост", ingredients: ["Хлеб", "Масло", "Варенье", "Сыр"] }
             ] 
         },
         { 
             name: "Обед", 
             subButtons: [
-                { 
-                    name: "Суп", 
-                    ingredients: [
-                        { name: "Картофель", quantity: "200г" },
-                        { name: "Морковь", quantity: "100г" },
-                        { name: "Лук", quantity: "50г" },
-                        { name: "Курица", quantity: "150г" },
-                        { name: "Зелень", quantity: "20г" },
-                        { name: "Специи", quantity: "по вкусу" }
-                    ] 
-                },
-                { 
-                    name: "Салат", 
-                    ingredients: [
-                        { name: "Помидоры", quantity: "150г" },
-                        { name: "Огурцы", quantity: "100г" },
-                        { name: "Лук", quantity: "30г" },
-                        { name: "Масло оливковое", quantity: "20мл" },
-                        { name: "Соль", quantity: "по вкусу" }
-                    ] 
-                },
-                { 
-                    name: "Мясо", 
-                    ingredients: [
-                        { name: "Говядина", quantity: "200г" },
-                        { name: "Лук", quantity: "50г" },
-                        { name: "Чеснок", quantity: "10г" },
-                        { name: "Специи", quantity: "по вкусу" },
-                        { name: "Масло растительное", quantity: "30мл" }
-                    ] 
-                }
+                { name: "Суп", ingredients: ["Куриный бульон", "Картофель", "Морковь", "Лук", "Лапша", "Зелень"] },
+                { name: "Салат", ingredients: ["Помидоры", "Огурцы", "Лук", "Масло", "Соль"] },
+                { name: "Мясо", ingredients: ["Говядина", "Специи", "Масло", "Чеснок"] }
             ] 
         },
         { 
             name: "Ужин", 
             subButtons: [
-                { name: "Рыба", ingredients: ["Филе рыбы", "Лимон", "Специи", "Зелень", "Оливковое масло"] },
-                { name: "Овощи", ingredients: ["Брокколи", "Морковь", "Цветная капуста", "Специи", "Масло"] },
-                { name: "Курица", ingredients: ["Куриное филе", "Чеснок", "Соевый соус", "Мед", "Специи"] }
+                { name: "Рыба", ingredients: ["Филе рыбы", "Лимон", "Специи", "Овощи"] },
+                { name: "Овощи", ingredients: ["Брокколи", "Морковь", "Цветная капуста", "Специи"] },
+                { name: "Курица", ingredients: ["Куриное филе", "Специи", "Оливковое масло"] }
             ] 
         }
     ],
     allergy: [
-        { name: "Пищевая", subButtons: ["Орехи", "Молоко", "Яйца"] },
-        { name: "Сезонная", subButtons: ["Пыльца", "Трава", "Деревья"] },
-        { name: "Лекарства", subButtons: ["Антибиотики", "Аспирин", "Пенициллин"] }
+        { 
+            name: "Пищевая", 
+            subButtons: [
+                { name: "Орехи", ingredients: ["Арахис", "Грецкие орехи", "Миндаль", "Фундук"] },
+                { name: "Молоко", ingredients: ["Лактоза", "Казеин"] },
+                { name: "Яйца", ingredients: ["Белок", "Желток"] }
+            ] 
+        }
     ],
     sleep: [
-        { name: "Качество", subButtons: ["Хорошее", "Плохое", "Прерывистый"] },
-        { name: "Продолжительность", subButtons: ["<6ч", "6-8ч", ">8ч"] },
-        { name: "Проблемы", subButtons: ["Бессонница", "Храп", "Апноэ"] }
+        { 
+            name: "Качество", 
+            subButtons: [
+                { name: "Хорошее", ingredients: ["Быстрое засыпание", "Глубокий сон", "Легкое пробуждение"] },
+                { name: "Плохое", ingredients: ["Бессонница", "Поверхностный сон", "Частые пробуждения"] }
+            ] 
+        }
     ],
     other: [
-        { name: "Настроение", subButtons: ["Хорошее", "Нормальное", "Плохое"] },
-        { name: "Активность", subButtons: ["Высокая", "Средняя", "Низкая"] },
-        { name: "Симптомы", subButtons: ["Головная боль", "Температура", "Слабость"] }
+        { 
+            name: "Настроение", 
+            subButtons: [
+                { name: "Хорошее", ingredients: ["Энергия", "Улыбка", "Оптимизм"] },
+                { name: "Плохое", ingredients: ["Усталость", "Раздражительность", "Апатия"] }
+            ] 
+        }
     ]
 };
 
 class HealthApp {
     constructor() {
-        this.currentCategory = 'nutrition';
-        this.currentMiddleButton = null;
-        this.currentDish = null;
-        this.selectedIngredients = new Set();
+        this.currentState = {
+            category: null,
+            middleButton: null,
+            selectedIngredients: new Set(),
+            history: []
+        };
         this.init();
     }
 
     init() {
         this.initTelegramApp();
         this.bindEvents();
-        this.loadCategoryButtons(this.currentCategory);
+        this.showMainCategories();
         this.updateCentering();
     }
 
@@ -97,50 +84,73 @@ class HealthApp {
     }
 
     bindEvents() {
-        // Обработчики для категорий
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const category = e.target.dataset.category;
+        document.getElementById('start-over-btn').addEventListener('click', () => {
+            this.startOver();
+        });
+
+        document.getElementById('save-btn').addEventListener('click', () => {
+            this.saveSelection();
+        });
+    }
+
+    showMainCategories() {
+        const leftPanel = document.getElementById('left-buttons');
+        leftPanel.innerHTML = '';
+
+        Object.keys(buttonData).forEach(category => {
+            const button = document.createElement('button');
+            button.className = 'button';
+            button.textContent = this.getCategoryName(category);
+            button.dataset.category = category;
+            
+            button.addEventListener('click', (e) => {
                 this.selectCategory(category);
             });
+            
+            leftPanel.appendChild(button);
         });
 
-        // Обработчики для кнопок навигации
-        document.getElementById('back-to-start').addEventListener('click', () => {
-            this.backToStart();
+        // Очищаем остальные панели
+        document.getElementById('middle-buttons').innerHTML = '';
+        document.getElementById('right-buttons').innerHTML = '';
+        
+        // Показываем все панели
+        document.querySelectorAll('.panel').forEach(panel => {
+            panel.classList.remove('hidden');
         });
+        
+        // Скрываем нижние кнопки
+        document.getElementById('bottom-buttons').classList.add('hidden');
+        
+        this.currentState = {
+            category: null,
+            middleButton: null,
+            selectedIngredients: new Set(),
+            history: []
+        };
+        
+        this.updateCentering();
+    }
 
-        document.getElementById('save-dish').addEventListener('click', () => {
-            this.saveDish();
-        });
-
-        // Обработчик изменения размера окна
-        window.addEventListener('resize', () => {
-            this.updateCentering();
-        });
+    getCategoryName(category) {
+        const names = {
+            nutrition: 'Питание',
+            allergy: 'Аллергия',
+            sleep: 'Сон',
+            other: 'Другое'
+        };
+        return names[category] || category;
     }
 
     selectCategory(category) {
-        // Обновляем активную категорию
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelector(`[data-category="${category}"]`).classList.add('active');
+        this.currentState.category = category;
+        this.currentState.history.push({ type: 'category', value: category });
         
-        this.currentCategory = category;
-        this.currentMiddleButton = null;
-        
-        // Загружаем кнопки для выбранной категории
-        this.loadCategoryButtons(category);
-        
-        // Очищаем правую панель
-        this.clearRightPanel();
-        
-        // Показываем все панели
-        this.showAllPanels();
+        this.loadMiddleButtons(category);
+        this.updateCentering();
     }
 
-    loadCategoryButtons(category) {
+    loadMiddleButtons(category) {
         const middlePanel = document.getElementById('middle-buttons');
         middlePanel.innerHTML = '';
 
@@ -159,43 +169,85 @@ class HealthApp {
             middlePanel.appendChild(buttonElement);
         });
 
+        // Очищаем правую панель
+        document.getElementById('right-buttons').innerHTML = '';
         this.updateCentering();
     }
 
     selectMiddleButton(buttonData, buttonElement) {
-        // Снимаем выделение со всех кнопок средней панели
-        document.querySelectorAll('#middle-buttons .button').forEach(btn => {
-            btn.classList.remove('active');
-        });
+        this.currentState.middleButton = buttonData;
+        this.currentState.history.push({ type: 'middle', value: buttonData.name });
         
-        // Выделяем выбранную кнопку
-        buttonElement.classList.add('active');
-        
-        this.currentMiddleButton = buttonData;
+        // Сдвигаем панели
+        this.shiftPanels();
         this.loadRightPanel(buttonData.subButtons);
     }
 
-    loadRightPanel(subButtons) {
+    shiftPanels() {
+        const panels = document.querySelectorAll('.panel');
+        
+        // Левая панель скрывается
+        panels[0].classList.add('hidden');
+        
+        // Средняя панель становится левой (показываем выбранную кнопку)
+        const middleButtons = document.getElementById('middle-buttons');
+        const selectedButton = middleButtons.querySelector('.button.active');
+        if (selectedButton) {
+            selectedButton.classList.remove('active');
+        }
+        
+        // Загружаем под-кнопки в среднюю панель
+        this.loadSubButtonsInMiddle();
+        
+        // Показываем нижние кнопки
+        document.getElementById('bottom-buttons').classList.remove('hidden');
+    }
+
+    loadSubButtonsInMiddle() {
+        const middlePanel = document.getElementById('middle-buttons');
+        middlePanel.innerHTML = '';
+
+        if (this.currentState.middleButton && this.currentState.middleButton.subButtons) {
+            this.currentState.middleButton.subButtons.forEach((subButton, index) => {
+                const buttonElement = document.createElement('button');
+                buttonElement.className = 'button';
+                buttonElement.textContent = subButton.name;
+                buttonElement.dataset.index = index;
+                
+                buttonElement.addEventListener('click', (e) => {
+                    this.selectSubButton(subButton, e.target);
+                });
+                
+                middlePanel.appendChild(buttonElement);
+            });
+        }
+    }
+
+    selectSubButton(subButtonData, buttonElement) {
+        // Помечаем кнопку как активную
+        document.querySelectorAll('#middle-buttons .button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        buttonElement.classList.add('active');
+        
+        this.currentState.history.push({ type: 'subButton', value: subButtonData.name });
+        this.loadIngredients(subButtonData.ingredients);
+    }
+
+    loadIngredients(ingredients) {
         const rightPanel = document.getElementById('right-buttons');
         rightPanel.innerHTML = '';
 
-        subButtons.forEach((subButton, index) => {
+        ingredients.forEach((ingredient, index) => {
             const buttonElement = document.createElement('button');
-            buttonElement.className = 'button';
-            
-            // Проверяем, является ли subButton объектом или строкой
-            if (typeof subButton === 'object') {
-                buttonElement.textContent = subButton.name;
-            } else {
-                buttonElement.textContent = subButton;
-            }
+            buttonElement.className = `button checkbox-button ${this.currentState.selectedIngredients.has(ingredient) ? 'selected' : ''}`;
+            buttonElement.innerHTML = `
+                <span>${ingredient}</span>
+                <div class="checkmark"></div>
+            `;
             
             buttonElement.addEventListener('click', () => {
-                if (typeof subButton === 'object' && subButton.ingredients) {
-                    this.showDishDetails(subButton);
-                } else {
-                    this.handleRightButtonClick(subButton);
-                }
+                this.toggleIngredient(ingredient, buttonElement);
             });
             
             rightPanel.appendChild(buttonElement);
@@ -204,145 +256,53 @@ class HealthApp {
         this.updateCentering();
     }
 
-    showDishDetails(dish) {
-        this.currentDish = dish;
-        this.selectedIngredients.clear();
-        
-        // Скрываем основные панели
-        this.hideMainPanels();
-        
-        // Показываем панель деталей блюда
-        const detailsPanel = document.getElementById('dish-details-panel');
-        detailsPanel.classList.add('active');
-        
-        // Устанавливаем название блюда
-        document.getElementById('dish-name').textContent = dish.name;
-        
-        // Загружаем ингредиенты
-        this.loadIngredients(dish.ingredients);
-        
-        // Обновляем кнопку сохранения
-        this.updateSaveButton();
-    }
-
-    loadIngredients(ingredients) {
-        const container = document.getElementById('ingredients-container');
-        container.innerHTML = '';
-
-        ingredients.forEach((ingredient, index) => {
-            const ingredientItem = document.createElement('div');
-            ingredientItem.className = 'ingredient-item';
-            ingredientItem.dataset.index = index;
-            
-            // Проверяем формат ингредиента (объект или строка)
-            const ingredientName = typeof ingredient === 'object' ? ingredient.name : ingredient;
-            const ingredientQuantity = typeof ingredient === 'object' ? ingredient.quantity : '';
-            
-            ingredientItem.innerHTML = `
-                <div class="ingredient-checkbox"></div>
-                <span class="ingredient-name">${ingredientName}</span>
-                ${ingredientQuantity ? `<span class="ingredient-quantity">${ingredientQuantity}</span>` : ''}
-            `;
-            
-            ingredientItem.addEventListener('click', () => {
-                this.toggleIngredient(ingredientName, ingredientItem);
-            });
-            
-            container.appendChild(ingredientItem);
-        });
-    }
-
-    toggleIngredient(ingredientName, ingredientElement) {
-        if (this.selectedIngredients.has(ingredientName)) {
-            this.selectedIngredients.delete(ingredientName);
-            ingredientElement.classList.remove('selected');
+    toggleIngredient(ingredient, buttonElement) {
+        if (this.currentState.selectedIngredients.has(ingredient)) {
+            this.currentState.selectedIngredients.delete(ingredient);
+            buttonElement.classList.remove('selected');
         } else {
-            this.selectedIngredients.add(ingredientName);
-            ingredientElement.classList.add('selected');
-        }
-        
-        this.updateSaveButton();
-    }
-
-    updateSaveButton() {
-        const saveBtn = document.getElementById('save-dish');
-        if (this.selectedIngredients.size > 0) {
-            saveBtn.disabled = false;
-        } else {
-            saveBtn.disabled = true;
+            this.currentState.selectedIngredients.add(ingredient);
+            buttonElement.classList.add('selected');
         }
     }
 
-    backToStart() {
-        // Скрываем панель деталей
-        const detailsPanel = document.getElementById('dish-details-panel');
-        detailsPanel.classList.remove('active');
-        
-        // Показываем основные панели
-        this.showAllPanels();
-        
-        // Сбрасываем выбранные ингредиенты
-        this.selectedIngredients.clear();
-        this.currentDish = null;
+    startOver() {
+        this.showMainCategories();
     }
 
-    saveDish() {
-        if (this.selectedIngredients.size === 0) return;
-        
-        const selectedIngredientsArray = Array.from(this.selectedIngredients);
-        
-        // Здесь можно добавить логику сохранения данных
-        console.log('Сохранено блюдо:', {
-            dish: this.currentDish.name,
-            selectedIngredients: selectedIngredientsArray
-        });
+    saveSelection() {
+        const selection = {
+            category: this.currentState.category,
+            middleButton: this.currentState.middleButton?.name,
+            selectedIngredients: Array.from(this.currentState.selectedIngredients)
+        };
+
+        console.log('Сохраненная выборка:', selection);
         
         // Показываем уведомление в Telegram
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.showPopup({
-                title: 'Сохранено!',
-                message: `Блюдо "${this.currentDish.name}" сохранено с ${this.selectedIngredients.size} ингредиентами`,
+                title: 'Успешно сохранено!',
+                message: `Выбрано ${selection.selectedIngredients.length} ингредиентов`,
                 buttons: [{ type: 'ok' }]
             });
         }
-        
+
         // Возвращаемся в начало
-        this.backToStart();
-    }
-
-    hideMainPanels() {
-        document.getElementById('left-panel').classList.add('hidden');
-        document.getElementById('middle-panel').classList.add('hidden');
-        document.getElementById('right-panel').classList.add('hidden');
-    }
-
-    showAllPanels() {
-        document.getElementById('left-panel').classList.remove('hidden');
-        document.getElementById('middle-panel').classList.remove('hidden');
-        document.getElementById('right-panel').classList.remove('hidden');
-    }
-
-    clearRightPanel() {
-        const rightPanel = document.getElementById('right-buttons');
-        rightPanel.innerHTML = '';
-        this.updateCentering();
-    }
-
-    handleRightButtonClick(buttonName) {
-        console.log(`Выбрано: ${this.currentCategory} -> ${this.currentMiddleButton?.name} -> ${buttonName}`);
+        this.startOver();
     }
 
     updateCentering() {
         const containers = document.querySelectorAll('.buttons-container');
         
         containers.forEach(container => {
-            const buttons = container.querySelectorAll('.button, .category-btn');
+            const buttons = container.querySelectorAll('.button');
             const containerHeight = container.clientHeight;
             const buttonsHeight = Array.from(buttons).reduce((total, btn) => {
                 return total + btn.offsetHeight + 10; // 10px - gap
             }, 0);
             
-            if (buttonsHeight < containerHeight) {
+            if (buttonsHeight < containerHeight && buttons.length > 0) {
                 container.classList.add('centered');
             } else {
                 container.classList.remove('centered');
