@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="panel left-panel">
+        <div class="panel left-panel" id="left-panel">
             <div class="buttons-container">
                 <button class="category-btn active" data-category="nutrition">Питание</button>
                 <button class="category-btn" data-category="allergy">Аллергия</button>
@@ -18,15 +18,29 @@
             </div>
         </div>
         
-        <div class="panel middle-panel">
+        <div class="panel middle-panel" id="middle-panel">
             <div class="buttons-container" id="middle-buttons">
                 <!-- Кнопки будут подгружаться динамически -->
             </div>
         </div>
         
-        <div class="panel right-panel">
+        <div class="panel right-panel" id="right-panel">
             <div class="buttons-container" id="right-buttons">
-                <!-- Кнопки будут подгружаться динамически -->
+                <!-- Состав блюда будет подгружаться динамически -->
+            </div>
+        </div>
+
+        <!-- Панель деталей блюда (скрыта по умолчанию) -->
+        <div class="dish-details-panel" id="dish-details-panel">
+            <div class="dish-header">
+                <h3 id="dish-name">Название блюда</h3>
+            </div>
+            <div class="ingredients-container" id="ingredients-container">
+                <!-- Ингредиенты будут подгружаться динамически -->
+            </div>
+            <div class="bottom-actions">
+                <button class="action-btn back-btn" id="back-to-start">В начало</button>
+                <button class="action-btn save-btn" id="save-dish">Сохранить</button>
             </div>
         </div>
     </div>
