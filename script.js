@@ -14,43 +14,7 @@ const buttonData = {
             subButtons: [
                 { name: "Суп", ingredients: ["Бульон", "Овощи", "Мясо", "Специи"] },
                 { name: "Салат", ingredients: ["Овощи", "Заправка", "Зелень", "Специи"] },
-                { name: "Мясо", ingredients: ["Говядина", "Курица", "Свинина", "Специи"] }
-            ] 
-        },
-        { 
-            name: "Ужин", 
-            subButtons: [
-                { name: "Рыба", ingredients: ["Филе рыбы", "Лимон", "Специи", "Зелень"] },
-                { name: "Овощи", ingredients: ["Свежие овощи", "Масло", "Соль", "Травы"] },
-                { name: "Курица", ingredients: ["Куриное филе", "Специи", "Масло", "Чеснок"] }
-            ] 
-        }
-    ],
-    allergy: [
-        { 
-            name: "Пищевая", 
-            subButtons: [
-                { name: "Орехи", ingredients: ["Арахис", "Грецкий орех", "Миндаль", "Фундук"] },
-                { name: "Молоко", ingredients: ["Лактоза", "Казеин", "Сыворотка"] },
-                { name: "Яйца", ingredients: ["Белок", "Желток"] }
-            ] 
-        }
-    ],
-    sleep: [
-        { 
-            name: "Качество", 
-            subButtons: [
-                { name: "Хорошее", ingredients: ["Глубокий сон", "Быстрое засыпание"] },
-                { name: "Плохое", ingredients: ["Бессонница", "Пробуждения"] }
-            ] 
-        }
-    ],
-    other: [
-        { 
-            name: "Настроение", 
-            subButtons: [
-                { name: "Хорошее", ingredients: ["Радость", "Энергия", "Спокойствие"] },
-                { name: "Плохое", ingredients: ["Грусть", "Раздражительность", "Усталость"] }
+                { name: "Мясо", ingredients: ["Говядина", "Курина", "Свинина", "Специи"] }
             ] 
         }
     ]
@@ -60,6 +24,8 @@ class HealthApp {
     constructor() {
         this.navigationStack = [];
         this.selectedIngredients = new Set();
+        this.customIngredients = this.loadCustomIngredients();
+        this.currentContext = null; // Текущий контекст для добавления кнопок
         this.init();
     }
 
@@ -88,6 +54,42 @@ class HealthApp {
         document.getElementById('save-btn').addEventListener('click', () => {
             this.saveSelection();
         });
+
+        document.getElementById('add-custom-btn').addEventListener('click', () => {
+            this.showAddModal();
+        });
+
+        // Модальное окно
+        document.getElementById('cancel-add').addEventListener('click', () => {
+            this.hideAddModal();
+        });
+
+        document.getElementById('confirm-add').addEventListener('click', () => {
+            this.addCustomItem();
+        });
+
+        document.getElementById('new-item-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.addCustomItem();
+            }
+        });
+
+        // Закрытие модального окна по клику вне его
+        document.getElementById('add-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'add-modal') {
+                this.hideAddModal();
+            }
+        });
+    }
+
+    // Сохранение в localStorage
+    saveCustomIngredients() {
+        localStorage.setItem('customIngredients', JSON.stringify(this.customIngredients));
+    }
+
+    loadCustomIngredients() {
+        const saved = localStorage.getItem('customIngredients');
+        return saved ? JSON.parse(saved) : {};
     }
 
     showMainCategories() {
@@ -99,12 +101,10 @@ class HealthApp {
         const middlePanel = document.getElementById('middle-buttons');
         const rightPanel = document.getElementById('right-buttons');
 
-        // Очищаем все панели
         leftPanel.innerHTML = '';
         middlePanel.innerHTML = '';
         rightPanel.innerHTML = '';
 
-        // Показываем основные категории в левой панели
         Object.keys(buttonData).forEach(category => {
             const button = this.createButton(category, () => {
                 this.showSubCategories(category);
@@ -123,20 +123,16 @@ class HealthApp {
         const middlePanel = document.getElementById('middle-buttons');
         const rightPanel = document.getElementById('right-buttons');
 
-        // Левая панель - основная категория (пустая, так как мы на первом уровне)
         leftPanel.innerHTML = '';
-
-        // Средняя панель - подкатегории (Завтрак, Обед, Ужин)
         middlePanel.innerHTML = '';
+        rightPanel.innerHTML = '';
+
         buttonData[category].forEach(item => {
             const button = this.createButton(item.name, () => {
                 this.showItems(category, item);
             });
             middlePanel.appendChild(button);
         });
-
-        // Правая панель пустая
-        rightPanel.innerHTML = '';
 
         this.updateCentering();
     }
@@ -152,7 +148,6 @@ class HealthApp {
         const middlePanel = document.getElementById('middle-buttons');
         const rightPanel = document.getElementById('right-buttons');
 
-        // Левая панель - подкатегории
         leftPanel.innerHTML = '';
         buttonData[category].forEach(item => {
             const button = this.createButton(item.name, () => {
@@ -164,7 +159,6 @@ class HealthApp {
             leftPanel.appendChild(button);
         });
 
-        // Средняя панель - элементы (Овсянка, Яйца, Тост)
         middlePanel.innerHTML = '';
         subCategory.subButtons.forEach(item => {
             const button = this.createButton(item.name, () => {
@@ -173,9 +167,7 @@ class HealthApp {
             middlePanel.appendChild(button);
         });
 
-        // Правая панель пустая
         rightPanel.innerHTML = '';
-
         this.updateCentering();
     }
 
@@ -185,13 +177,14 @@ class HealthApp {
             { type: 'subCategory', name: subCategory.name },
             { type: 'item', name: item.name }
         ];
+        
+        this.currentContext = { category, subCategory: subCategory.name, item: item.name };
         this.showActionPanel();
 
         const leftPanel = document.getElementById('left-buttons');
         const middlePanel = document.getElementById('middle-buttons');
         const rightPanel = document.getElementById('right-buttons');
 
-        // Левая панель - элементы (Овсянка, Яйца, Тост)
         leftPanel.innerHTML = '';
         subCategory.subButtons.forEach(subItem => {
             const button = this.createButton(subItem.name, () => {
@@ -203,13 +196,13 @@ class HealthApp {
             leftPanel.appendChild(button);
         });
 
-        // Средняя панель - выбранный элемент
         middlePanel.innerHTML = '';
         const mainButton = this.createButton(item.name, () => {}, true);
         middlePanel.appendChild(mainButton);
 
-        // Правая панель - ингредиенты
         rightPanel.innerHTML = '';
+        
+        // Показываем стандартные ингредиенты
         item.ingredients.forEach(ingredient => {
             const button = this.createButton(ingredient, () => {
                 this.toggleIngredient(ingredient, button);
@@ -219,6 +212,27 @@ class HealthApp {
             }
             rightPanel.appendChild(button);
         });
+
+        // Показываем пользовательские ингредиенты для этого блюда
+        const customKey = `${category}_${subCategory.name}_${item.name}`;
+        if (this.customIngredients[customKey]) {
+            this.customIngredients[customKey].forEach(ingredient => {
+                const button = this.createButton(ingredient, () => {
+                    this.toggleIngredient(ingredient, button);
+                }, false, true); // true - это пользовательская кнопка
+                if (this.selectedIngredients.has(ingredient)) {
+                    button.classList.add('selected');
+                }
+                rightPanel.appendChild(button);
+            });
+        }
+
+        // Добавляем кнопку для создания нового ингредиента
+        const addButton = this.createButton("+ Добавить", () => {
+            this.showAddModal();
+        }, false, true);
+        addButton.classList.add('custom');
+        rightPanel.appendChild(addButton);
 
         this.updateCentering();
     }
@@ -233,9 +247,12 @@ class HealthApp {
         }
     }
 
-    createButton(text, onClick, isMain = false) {
+    createButton(text, onClick, isMain = false, isCustom = false) {
         const button = document.createElement('button');
         button.className = isMain ? 'button active' : 'button';
+        if (isCustom) {
+            button.classList.add('custom');
+        }
         button.textContent = text;
         button.addEventListener('click', onClick);
         return button;
@@ -247,6 +264,46 @@ class HealthApp {
 
     hideActionPanel() {
         document.getElementById('action-panel').style.display = 'none';
+    }
+
+    showAddModal() {
+        document.getElementById('add-modal').style.display = 'flex';
+        document.getElementById('new-item-input').value = '';
+        document.getElementById('new-item-input').focus();
+    }
+
+    hideAddModal() {
+        document.getElementById('add-modal').style.display = 'none';
+    }
+
+    addCustomItem() {
+        const input = document.getElementById('new-item-input');
+        const newItem = input.value.trim();
+        
+        if (newItem && this.currentContext) {
+            const { category, subCategory, item } = this.currentContext;
+            const customKey = `${category}_${subCategory}_${item}`;
+            
+            // Инициализируем массив, если его нет
+            if (!this.customIngredients[customKey]) {
+                this.customIngredients[customKey] = [];
+            }
+            
+            // Добавляем новый элемент, если его еще нет
+            if (!this.customIngredients[customKey].includes(newItem)) {
+                this.customIngredients[customKey].push(newItem);
+                this.saveCustomIngredients();
+                
+                // Обновляем отображение
+                this.showIngredients(
+                    category,
+                    buttonData[category].find(sc => sc.name === subCategory),
+                    { name: item, ingredients: [] }
+                );
+            }
+            
+            this.hideAddModal();
+        }
     }
 
     startOver() {
@@ -283,7 +340,7 @@ class HealthApp {
             const buttons = container.querySelectorAll('.button');
             const containerHeight = container.clientHeight;
             const buttonsHeight = Array.from(buttons).reduce((total, btn) => {
-                return total + btn.offsetHeight + 10; // 10px - gap
+                return total + btn.offsetHeight + 10;
             }, 0);
             
             if (buttonsHeight < containerHeight && buttons.length > 0) {
