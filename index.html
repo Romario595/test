@@ -31,7 +31,20 @@
     <!-- Нижняя панель с кнопками действий -->
     <div class="action-panel" id="action-panel">
         <button class="action-btn" id="start-over-btn">В начало</button>
+        <button class="action-btn" id="add-custom-btn">Добавить</button>
         <button class="action-btn" id="save-btn">Сохранить</button>
+    </div>
+
+    <!-- Модальное окно для добавления кнопки -->
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <h3>Добавить новый элемент</h3>
+            <input type="text" id="new-item-input" placeholder="Введите название..." maxlength="20">
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="cancel-add">Отмена</button>
+                <button class="modal-btn confirm" id="confirm-add">Добавить</button>
+            </div>
+        </div>
     </div>
     
     <script src="script.js"></script>
